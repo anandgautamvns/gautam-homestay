@@ -22,22 +22,22 @@ const Header: React.FC = () => {
 
 
   return (
-    <Layout.Header className={styles.container} >
-      <div className={styles.headerLeft}>
-        <Menu
-          theme={isDarkMode ? MenuThemeEntity.DARK : MenuThemeEntity.LIGHT}
-          mode={MenuModeEntity.HORIZONTAL}
-          selectedKeys={[selectedKey]}
-          items={menuItems}
-          style={{ flex: 1, minWidth: 0 }}
-          onClick={handleMenuClick}
-        />
-      </div>
-      <div className={styles.headerCenter}>
-        <div className={styles.headerText} style={{ flex: 1, minWidth: 0 }}>Gautam Homestay</div>
-      </div>
+    <Layout.Header className={styles.container} style={{ display: 'flex', alignItems: 'center' }} >
+      {/* <div className={styles.headerCenter}>
+        <div className={styles.headerText} >Gautam Homestay</div>
+      </div> */}
+      <div className="demo-logo" >Gautam Homestay</div>
+      <Menu
+        theme={isDarkMode ? MenuThemeEntity.DARK : MenuThemeEntity.LIGHT}
+        mode={MenuModeEntity.HORIZONTAL}
+        selectedKeys={[selectedKey]}
+        items={menuItems}
+        // style={{ flex: 1, minWidth: 0 }}
+        onClick={handleMenuClick}
+      />
+
       <div className={styles.headerRight}>
-        <div style={{ flex: 1, minWidth: 0 }}>call</div>
+        <div >call</div>
       </div>
     </Layout.Header>
   )
