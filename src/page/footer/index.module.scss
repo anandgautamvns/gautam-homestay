@@ -1,0 +1,14 @@
+.container {
+  background-image: url('../../assets/images/image1.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: scroll;
+  width: 100%;
+  height: auto;
+
+  .copyRightText {
+    z-index: 10;
+    text-align: center;
+  }
+}

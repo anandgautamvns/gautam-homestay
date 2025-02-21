@@ -8,6 +8,8 @@ import { MoonOutlined, SunOutlined } from '@ant-design/icons'
 import { ConfigProvider, Layout, theme as antTheme, Switch } from "antd";
 import { ThemeDataEntity } from './type';
 import { useThemeContext } from '../themeContext';
+import Footer from './footer';
+import GoogleMapComponent from './googleMap';
 
 const { Content } = Layout;
 
@@ -51,6 +53,8 @@ const Page: React.FC = () => {
               <Route path="/about" element={<About />} />
             </Routes>
           </Content>
+          <GoogleMapComponent />
+          <Footer />
         </Layout>
       </BrowserRouter >
       <Switch
