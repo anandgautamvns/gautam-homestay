@@ -1,8 +1,6 @@
 import React from 'react'
 import styles from './index.module.scss'
 import { Col, Divider, Layout, Row } from 'antd';
-import Image1 from '../../assets/images/image1.png'
-import GoogleMapComponent from '../googleMap';
 
 const Footer: React.FC = () => {
   return (
