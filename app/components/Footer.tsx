@@ -5,9 +5,15 @@ export default function Footer() {
         <span className="text-white font-semibold text-base">Gautam Homestay</span>
         <p>© {new Date().getFullYear()} Gautam Homestay. All rights reserved.</p>
         <div className="flex gap-6">
-          <a href="#rooms" className="hover:text-white transition-colors">Rooms</a>
-          <a href="#amenities" className="hover:text-white transition-colors">Amenities</a>
-          <a href="#contact" className="hover:text-white transition-colors">Contact</a>
+          <a href="#rooms" className="hover:text-white transition-colors">
+            Rooms
+          </a>
+          <a href="#amenities" className="hover:text-white transition-colors">
+            Amenities
+          </a>
+          <a href="#contact" className="hover:text-white transition-colors">
+            Contact
+          </a>
         </div>
       </div>
     </footer>

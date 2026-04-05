@@ -1,12 +1,12 @@
-import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
-import Stats from "./components/Stats";
-import Rooms from "./components/Rooms";
-import Amenities from "./components/Amenities";
-import Gallery from "./components/Gallery";
-import Testimonials from "./components/Testimonials";
-import Contact from "./components/Contact";
-import Footer from "./components/Footer";
+import Amenities from './components/Amenities';
+import Contact from './components/Contact';
+import Footer from './components/Footer';
+import Gallery from './components/Gallery';
+import Hero from './components/Hero';
+import Navbar from './components/Navbar';
+import Rooms from './components/Rooms';
+import Stats from './components/Stats';
+import Testimonials from './components/Testimonials';
 
 export default function Home() {
   return (

@@ -22,8 +22,8 @@ export default function Hero() {
           <span className="text-amber-400">From Home</span>
         </h1>
         <p className="text-stone-300 text-lg md:text-xl leading-relaxed mb-10">
-          Nestled in the heart of nature — experience warm hospitality,
-          home-cooked meals, and peaceful surroundings that rejuvenate your soul.
+          Nestled in the heart of nature — experience warm hospitality, home-cooked meals, and
+          peaceful surroundings that rejuvenate your soul.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
@@ -44,7 +44,12 @@ export default function Hero() {
       {/* scroll indicator */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-stone-400 text-xs">
         <span>Scroll to explore</span>
-        <svg className="w-5 h-5 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          className="w-5 h-5 animate-bounce"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </div>
