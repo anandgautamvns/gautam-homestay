@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+
 import { useTranslation } from 'react-i18next';
 
 import { useGetRoomsQuery } from '@/app/features/api/homestayApi';
