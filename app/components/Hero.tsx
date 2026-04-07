@@ -1,4 +1,9 @@
+'use client';
+import { useTranslation } from 'react-i18next';
+
 export default function Hero() {
+  const { t } = useTranslation();
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-stone-900">
       {/* gradient overlay */}
@@ -15,35 +20,34 @@ export default function Hero() {
 
       <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
         <span className="inline-block bg-amber-600/20 text-amber-300 text-xs font-semibold tracking-widest uppercase px-4 py-1.5 rounded-full mb-6 border border-amber-500/30">
-          Welcome to Gautam Homestay
+          {t('hero.badge')}
         </span>
         <h1 className="text-5xl md:text-6xl font-bold text-white leading-tight mb-6">
-          A Home Away <br />
-          <span className="text-amber-400">From Home</span>
+          {t('hero.heading')} <br />
+          <span className="text-amber-400">{t('hero.headingAccent')}</span>
         </h1>
         <p className="text-stone-300 text-lg md:text-xl leading-relaxed mb-10">
-          Nestled in the heart of nature — experience warm hospitality, home-cooked meals, and
-          peaceful surroundings that rejuvenate your soul.
+          {t('hero.body')}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
             href="#rooms"
             className="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-8 py-4 rounded-full transition-colors text-base"
           >
-            Explore Rooms
+            {t('hero.cta_rooms')}
           </a>
           <a
             href="#contact"
             className="border border-white/30 hover:border-white/60 text-white font-semibold px-8 py-4 rounded-full transition-colors text-base backdrop-blur-sm"
           >
-            Get in Touch
+            {t('hero.cta_contact')}
           </a>
         </div>
       </div>
 
       {/* scroll indicator */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-stone-400 text-xs">
-        <span>Scroll to explore</span>
+        <span>{t('hero.scroll')}</span>
         <svg
           className="w-5 h-5 animate-bounce"
           fill="none"

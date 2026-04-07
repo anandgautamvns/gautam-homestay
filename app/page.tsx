@@ -10,7 +10,7 @@ import Testimonials from './components/Testimonials';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white font-sans">
+    <div className="min-h-screen bg-white dark:bg-stone-950 font-sans">
       <Navbar />
       <Hero />
       <Stats />

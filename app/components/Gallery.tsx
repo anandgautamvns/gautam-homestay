@@ -1,20 +1,23 @@
 'use client';
+import { useTranslation } from 'react-i18next';
+
 import { useGetGalleryQuery } from '@/app/features/api/homestayApi';
 
 import SectionError from './ui/SectionError';
 
 export default function Gallery() {
+  const { t } = useTranslation();
   const { data: photos, isLoading, isError, refetch } = useGetGalleryQuery();
 
   return (
-    <section id="gallery" className="py-20 px-6 bg-white">
+    <section id="gallery" className="py-20 px-6 bg-white dark:bg-stone-950">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-14">
-          <span className="text-amber-600 text-sm font-semibold tracking-widest uppercase">
-            Photos
+          <span className="text-amber-600 dark:text-amber-400 text-sm font-semibold tracking-widest uppercase">
+            {t('gallery.eyebrow')}
           </span>
-          <h2 className="text-4xl font-bold text-stone-800 mt-2">Gallery</h2>
-          <p className="text-stone-500 mt-3">A glimpse into life at Gautam Homestay.</p>
+          <h2 className="text-4xl font-bold text-stone-800 dark:text-stone-100 mt-2">{t('gallery.heading')}</h2>
+          <p className="text-stone-500 dark:text-stone-400 mt-3">{t('gallery.body')}</p>
         </div>
 
         {/* Loading skeleton */}
@@ -30,10 +33,7 @@ export default function Gallery() {
         )}
 
         {isError && (
-          <SectionError
-            message="Could not load gallery photos. Please try again."
-            onRetry={refetch}
-          />
+          <SectionError message={t('gallery.error')} onRetry={refetch} />
         )}
 
         {photos && (

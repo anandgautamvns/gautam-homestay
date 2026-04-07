@@ -1,7 +1,9 @@
 'use client';
+import { ThemeProvider } from 'next-themes';
 import { Provider } from 'react-redux';
 
 import { AuthProvider } from '@/app/context/AuthContext';
+import '@/app/i18n/config'; // initialise i18next before any component renders
 import { store } from '@/app/store';
 
 /**
@@ -11,7 +13,9 @@ import { store } from '@/app/store';
 export default function ClientProviders({ children }: { children: React.ReactNode }) {
   return (
     <Provider store={store}>
-      <AuthProvider>{children}</AuthProvider>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <AuthProvider>{children}</AuthProvider>
+      </ThemeProvider>
     </Provider>
   );
 }

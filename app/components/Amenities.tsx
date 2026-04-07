@@ -1,21 +1,24 @@
 'use client';
+import { useTranslation } from 'react-i18next';
+
 import { useGetAmenitiesQuery } from '@/app/features/api/homestayApi';
 
 import SectionError from './ui/SectionError';
 
 export default function Amenities() {
+  const { t } = useTranslation();
   const { data: amenities, isLoading, isError, refetch } = useGetAmenitiesQuery();
 
   return (
-    <section id="amenities" className="py-20 px-6 bg-stone-50">
+    <section id="amenities" className="py-20 px-6 bg-stone-50 dark:bg-stone-900">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-14">
-          <span className="text-amber-600 text-sm font-semibold tracking-widest uppercase">
-            What We Offer
+          <span className="text-amber-600 dark:text-amber-400 text-sm font-semibold tracking-widest uppercase">
+            {t('amenities.eyebrow')}
           </span>
-          <h2 className="text-4xl font-bold text-stone-800 mt-2">Amenities</h2>
-          <p className="text-stone-500 mt-3 max-w-xl mx-auto">
-            Everything you need for a comfortable and memorable stay.
+          <h2 className="text-4xl font-bold text-stone-800 dark:text-stone-100 mt-2">{t('amenities.heading')}</h2>
+          <p className="text-stone-500 dark:text-stone-400 mt-3 max-w-xl mx-auto">
+            {t('amenities.body')}
           </p>
         </div>
 
@@ -34,7 +37,7 @@ export default function Amenities() {
         )}
 
         {isError && (
-          <SectionError message="Could not load amenities. Please try again." onRetry={refetch} />
+          <SectionError message={t('amenities.error')} onRetry={refetch} />
         )}
 
         {amenities && (
@@ -42,11 +45,11 @@ export default function Amenities() {
             {amenities.map((item) => (
               <div
                 key={item.id}
-                className="bg-white rounded-2xl p-6 flex flex-col gap-3 hover:shadow-md transition-shadow"
+                className="bg-white dark:bg-stone-800 rounded-2xl p-6 flex flex-col gap-3 hover:shadow-md transition-shadow"
               >
                 <span className="text-3xl">{item.icon}</span>
-                <h3 className="font-semibold text-stone-800">{item.title}</h3>
-                <p className="text-stone-500 text-sm leading-relaxed">{item.desc}</p>
+                <h3 className="font-semibold text-stone-800 dark:text-stone-100">{item.title}</h3>
+                <p className="text-stone-500 dark:text-stone-400 text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>

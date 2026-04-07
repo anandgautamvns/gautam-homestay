@@ -1,3 +1,6 @@
+'use client';
+import { useTranslation } from 'react-i18next';
+
 interface SectionErrorProps {
   message?: string;
   onRetry?: () => void;
@@ -11,6 +14,7 @@ export default function SectionError({
   onRetry,
   variant = 'light',
 }: SectionErrorProps) {
+  const { t } = useTranslation();
   const isDark = variant === 'dark';
 
   return (
@@ -33,7 +37,7 @@ export default function SectionError({
               : 'border-stone-300 text-stone-700 hover:border-amber-500 hover:text-amber-700'
           }`}
         >
-          Retry
+          {t('common.retry')}
         </button>
       )}
     </div>

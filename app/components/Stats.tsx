@@ -1,13 +1,16 @@
 'use client';
+import { useTranslation } from 'react-i18next';
+
 import { useGetStatsQuery } from '@/app/features/api/homestayApi';
 
 import SectionError from './ui/SectionError';
 
 export default function Stats() {
+  const { t } = useTranslation();
   const { data: stats, isLoading, isError, refetch } = useGetStatsQuery();
 
   return (
-    <section className="bg-amber-50 py-12 px-6">
+    <section className="bg-amber-50 dark:bg-stone-800 py-12 px-6">
       <div className="max-w-6xl mx-auto">
         {isLoading && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -21,15 +24,15 @@ export default function Stats() {
         )}
 
         {isError && (
-          <SectionError message="Could not load statistics. Please try again." onRetry={refetch} />
+          <SectionError message={t('stats.error')} onRetry={refetch} />
         )}
 
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {stats.map((stat) => (
               <div key={stat.id}>
-                <p className="text-3xl font-bold text-amber-700">{stat.number}</p>
-                <p className="text-stone-600 text-sm mt-1">{stat.label}</p>
+                <p className="text-3xl font-bold text-amber-700 dark:text-amber-400">{stat.number}</p>
+                <p className="text-stone-600 dark:text-stone-400 text-sm mt-1">{stat.label}</p>
               </div>
             ))}
           </div>

@@ -1,19 +1,22 @@
 'use client';
+import { useTranslation } from 'react-i18next';
+
 import { useGetReviewsQuery } from '@/app/features/api/homestayApi';
 
 import SectionError from './ui/SectionError';
 
 export default function Testimonials() {
+  const { t } = useTranslation();
   const { data: reviews, isLoading, isError, refetch } = useGetReviewsQuery();
 
   return (
-    <section className="py-20 px-6 bg-stone-800">
+    <section className="py-20 px-6 bg-stone-800 dark:bg-stone-900">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-14">
           <span className="text-amber-400 text-sm font-semibold tracking-widest uppercase">
-            Guest Reviews
+            {t('testimonials.eyebrow')}
           </span>
-          <h2 className="text-4xl font-bold text-white mt-2">What Our Guests Say</h2>
+          <h2 className="text-4xl font-bold text-white mt-2">{t('testimonials.heading')}</h2>
         </div>
 
         {/* Loading skeleton */}
@@ -41,22 +44,18 @@ export default function Testimonials() {
         )}
 
         {isError && (
-          <SectionError
-            message="Could not load guest reviews. Please try again."
-            onRetry={refetch}
-            variant="dark"
-          />
+          <SectionError message={t('testimonials.error')} onRetry={refetch} variant="dark" />
         )}
 
         {reviews && (
           <div className="grid md:grid-cols-3 gap-6">
-            {reviews.map((t) => (
-              <div key={t.id} className="bg-stone-700 rounded-2xl p-6 flex flex-col gap-4">
-                <div className="flex text-amber-400 text-sm">{'★'.repeat(t.rating)}</div>
-                <p className="text-stone-200 leading-relaxed italic">&ldquo;{t.review}&rdquo;</p>
+            {reviews.map((t_) => (
+              <div key={t_.id} className="bg-stone-700 rounded-2xl p-6 flex flex-col gap-4">
+                <div className="flex text-amber-400 text-sm">{'★'.repeat(t_.rating)}</div>
+                <p className="text-stone-200 leading-relaxed italic">&ldquo;{t_.review}&rdquo;</p>
                 <div className="mt-auto pt-4 border-t border-stone-600">
-                  <p className="text-white font-semibold">{t.name}</p>
-                  <p className="text-stone-400 text-sm">{t.location}</p>
+                  <p className="text-white font-semibold">{t_.name}</p>
+                  <p className="text-stone-400 text-sm">{t_.location}</p>
                 </div>
               </div>
             ))}

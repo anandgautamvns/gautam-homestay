@@ -1,5 +1,7 @@
 'use client';
-import { type ChangeEvent, type FormEvent, useState } from 'react';
+import { type ChangeEvent, useState } from 'react';
+
+import { useTranslation } from 'react-i18next';
 
 import { useGetContactInfoQuery, useSubmitBookingMutation } from '@/app/features/api/homestayApi';
 
@@ -19,6 +21,7 @@ const emptyForm: BookingRequest = {
 };
 
 export default function Contact() {
+  const { t } = useTranslation();
   const {
     data: info,
     isLoading: infoLoading,
@@ -38,7 +41,7 @@ export default function Contact() {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault();
     const result = await submitBooking(form);
     if ('data' in result) {
@@ -46,30 +49,28 @@ export default function Contact() {
     }
   };
 
-  // Extract a human-readable message from the RTK Query error shape
   const submitErrorMsg = rawError
     ? 'error' in rawError
       ? (rawError.error as string)
       : 'data' in rawError
-        ? ((rawError.data as { message?: string })?.message ?? 'Submission failed.')
-        : 'Submission failed. Please try again.'
-    : 'Submission failed. Please try again.';
+        ? ((rawError.data as { message?: string })?.message ?? t('contact.submit_error'))
+        : t('contact.submit_error')
+    : t('contact.submit_error');
 
   const inputClass =
-    'border border-stone-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-amber-400 transition w-full';
+    'border border-stone-200 dark:border-stone-600 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-amber-400 transition w-full bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500';
 
   return (
-    <section id="contact" className="py-20 px-6 bg-amber-50">
+    <section id="contact" className="py-20 px-6 bg-amber-50 dark:bg-stone-800">
       <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-start">
         {/* ── Contact info side ─────────────────────────────────────────── */}
         <div>
-          <span className="text-amber-600 text-sm font-semibold tracking-widest uppercase">
-            Get in Touch
+          <span className="text-amber-600 dark:text-amber-400 text-sm font-semibold tracking-widest uppercase">
+            {t('contact.eyebrow')}
           </span>
-          <h2 className="text-4xl font-bold text-stone-800 mt-2 mb-4">Book Your Stay</h2>
-          <p className="text-stone-500 leading-relaxed mb-8">
-            Ready to experience Gautam Homestay? Send us a message with your preferred dates and
-            room type and we&apos;ll get back to you within a few hours.
+          <h2 className="text-4xl font-bold text-stone-800 dark:text-stone-100 mt-2 mb-4">{t('contact.heading')}</h2>
+          <p className="text-stone-500 dark:text-stone-400 leading-relaxed mb-8">
+            {t('contact.body')}
           </p>
 
           {infoLoading && (
@@ -86,19 +87,19 @@ export default function Contact() {
             </div>
           )}
 
-          {infoError && <SectionError message="Could not load contact info." onRetry={refetch} />}
+          {infoError && <SectionError message={t('contact.error_info')} onRetry={refetch} />}
 
           {info && (
-            <div className="flex flex-col gap-4 text-stone-700">
+            <div className="flex flex-col gap-4 text-stone-700 dark:text-stone-300">
               {[
-                { icon: '📞', label: 'Phone / WhatsApp', value: info.phone },
-                { icon: '✉️', label: 'Email', value: info.email },
-                { icon: '📍', label: 'Location', value: info.address },
+                { icon: '📞', label: t('contact.phone_label'), value: info.phone },
+                { icon: '✉️', label: t('contact.email_label'), value: info.email },
+                { icon: '📍', label: t('contact.location_label'), value: info.address },
               ].map((item) => (
                 <div key={item.label} className="flex items-start gap-3">
                   <span className="text-2xl mt-0.5">{item.icon}</span>
                   <div>
-                    <p className="text-xs text-stone-500 uppercase tracking-wide">{item.label}</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400 uppercase tracking-wide">{item.label}</p>
                     <p className="font-semibold">{item.value}</p>
                   </div>
                 </div>
@@ -111,18 +112,17 @@ export default function Contact() {
 
         {/* Success confirmation */}
         {isSuccess && (
-          <div className="bg-white rounded-2xl p-8 shadow-sm flex flex-col items-center gap-4 text-center">
+          <div className="bg-white dark:bg-stone-700 rounded-2xl p-8 shadow-sm flex flex-col items-center gap-4 text-center">
             <span className="text-5xl">🎉</span>
-            <h3 className="text-xl font-bold text-stone-800">Booking Request Sent!</h3>
-            <p className="text-stone-500 text-sm leading-relaxed">
-              We&apos;ve received your request and will confirm availability and contact you within
-              a few hours.
+            <h3 className="text-xl font-bold text-stone-800 dark:text-stone-100">{t('contact.success_heading')}</h3>
+            <p className="text-stone-500 dark:text-stone-300 text-sm leading-relaxed">
+              {t('contact.success_body')}
             </p>
             <button
               onClick={reset}
               className="mt-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-colors text-sm"
             >
-              Send Another Request
+              {t('contact.send_another')}
             </button>
           </div>
         )}
@@ -130,12 +130,12 @@ export default function Contact() {
         {!isSuccess && (
           <form
             onSubmit={handleSubmit}
-            className="bg-white rounded-2xl p-8 shadow-sm flex flex-col gap-5"
+            className="bg-white dark:bg-stone-700 rounded-2xl p-8 shadow-sm flex flex-col gap-5"
           >
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-stone-700">
-                  First Name <span className="text-amber-600">*</span>
+                <label className="text-sm font-medium text-stone-700 dark:text-stone-200">
+                  {t('contact.first_name')} <span className="text-amber-600">*</span>
                 </label>
                 <input
                   name="firstName"
@@ -148,8 +148,8 @@ export default function Contact() {
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-stone-700">
-                  Last Name <span className="text-amber-600">*</span>
+                <label className="text-sm font-medium text-stone-700 dark:text-stone-200">
+                  {t('contact.last_name')} <span className="text-amber-600">*</span>
                 </label>
                 <input
                   name="lastName"
@@ -165,8 +165,8 @@ export default function Contact() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-stone-700">
-                  Email <span className="text-amber-600">*</span>
+                <label className="text-sm font-medium text-stone-700 dark:text-stone-200">
+                  {t('contact.email')} <span className="text-amber-600">*</span>
                 </label>
                 <input
                   name="email"
@@ -179,7 +179,7 @@ export default function Contact() {
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-stone-700">Phone</label>
+                <label className="text-sm font-medium text-stone-700 dark:text-stone-200">{t('contact.phone')}</label>
                 <input
                   name="phone"
                   type="tel"
@@ -193,8 +193,8 @@ export default function Contact() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-stone-700">
-                  Check-in <span className="text-amber-600">*</span>
+                <label className="text-sm font-medium text-stone-700 dark:text-stone-200">
+                  {t('contact.check_in')} <span className="text-amber-600">*</span>
                 </label>
                 <input
                   name="checkIn"
@@ -206,8 +206,8 @@ export default function Contact() {
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-stone-700">
-                  Check-out <span className="text-amber-600">*</span>
+                <label className="text-sm font-medium text-stone-700 dark:text-stone-200">
+                  {t('contact.check_out')} <span className="text-amber-600">*</span>
                 </label>
                 <input
                   name="checkOut"
@@ -221,31 +221,31 @@ export default function Contact() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-stone-700">
-                Room Type <span className="text-amber-600">*</span>
+              <label className="text-sm font-medium text-stone-700 dark:text-stone-200">
+                {t('contact.room_type')} <span className="text-amber-600">*</span>
               </label>
               <select
                 name="roomType"
                 required
                 value={form.roomType}
                 onChange={handleChange}
-                className={`${inputClass} bg-white`}
+                className={inputClass}
               >
-                <option value="">Select a room</option>
-                <option value="Standard Room">Standard Room — ₹1,200/night</option>
-                <option value="Deluxe Room">Deluxe Room — ₹1,800/night</option>
-                <option value="Family Suite">Family Suite — ₹2,800/night</option>
+                <option value="">{t('contact.select_room')}</option>
+                <option value="Standard Room">{t('contact.room_standard')}</option>
+                <option value="Deluxe Room">{t('contact.room_deluxe')}</option>
+                <option value="Family Suite">{t('contact.room_family')}</option>
               </select>
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-stone-700">Message (optional)</label>
+              <label className="text-sm font-medium text-stone-700 dark:text-stone-200">{t('contact.message')}</label>
               <textarea
                 name="message"
                 rows={3}
                 value={form.message}
                 onChange={handleChange}
-                placeholder="Special requests, number of guests…"
+                placeholder={t('contact.message_placeholder')}
                 className={`${inputClass} resize-none`}
               />
             </div>
@@ -262,7 +262,7 @@ export default function Contact() {
               disabled={submitting}
               className="w-full bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 text-white font-semibold py-4 rounded-xl transition-colors text-base"
             >
-              {submitting ? 'Sending…' : 'Send Booking Request'}
+              {submitting ? t('contact.submitting') : t('contact.submit')}
             </button>
           </form>
         )}

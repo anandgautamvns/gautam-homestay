@@ -1,0 +1,88 @@
+{
+  "nav": {
+    "brand": "Gautam Homestay",
+    "rooms": "Rooms",
+    "amenities": "Amenities",
+    "gallery": "Gallery",
+    "contact": "Contact",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout"
+  },
+  "hero": {
+    "badge": "Welcome to Gautam Homestay",
+    "heading": "A Home Away",
+    "headingAccent": "From Home",
+    "body": "Nestled in the heart of nature — experience warm hospitality, home-cooked meals, and peaceful surroundings that rejuvenate your soul.",
+    "cta_rooms": "Explore Rooms",
+    "cta_contact": "Get in Touch",
+    "scroll": "Scroll to explore"
+  },
+  "stats": {
+    "error": "Could not load statistics. Please try again."
+  },
+  "rooms": {
+    "eyebrow": "Accommodation",
+    "heading": "Our Rooms",
+    "body": "Each room is thoughtfully furnished to give you the comfort of home with the charm of a mountain retreat.",
+    "popular": "Most Popular",
+    "per_night": "/night",
+    "book": "Book This Room",
+    "error": "Could not load room listings. Please try again."
+  },
+  "amenities": {
+    "eyebrow": "What We Offer",
+    "heading": "Amenities",
+    "body": "Everything you need for a comfortable and memorable stay.",
+    "error": "Could not load amenities. Please try again."
+  },
+  "gallery": {
+    "eyebrow": "Photos",
+    "heading": "Gallery",
+    "body": "A glimpse into life at Gautam Homestay.",
+    "error": "Could not load gallery photos. Please try again."
+  },
+  "testimonials": {
+    "eyebrow": "Guest Reviews",
+    "heading": "What Our Guests Say",
+    "error": "Could not load guest reviews. Please try again."
+  },
+  "contact": {
+    "eyebrow": "Get in Touch",
+    "heading": "Book Your Stay",
+    "body": "Ready to experience Gautam Homestay? Send us a message with your preferred dates and room type and we'll get back to you within a few hours.",
+    "phone_label": "Phone / WhatsApp",
+    "email_label": "Email",
+    "location_label": "Location",
+    "success_heading": "Booking Request Sent!",
+    "success_body": "We've received your request and will confirm availability and contact you within a few hours.",
+    "send_another": "Send Another Request",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "check_in": "Check-in",
+    "check_out": "Check-out",
+    "room_type": "Room Type",
+    "message": "Message (optional)",
+    "select_room": "Select a room",
+    "room_standard": "Standard Room — ₹1,200/night",
+    "room_deluxe": "Deluxe Room — ₹1,800/night",
+    "room_family": "Family Suite — ₹2,800/night",
+    "message_placeholder": "Special requests, number of guests…",
+    "submit": "Send Booking Request",
+    "submitting": "Sending…",
+    "error_info": "Could not load contact info.",
+    "submit_error": "Submission failed. Please try again."
+  },
+  "footer": {
+    "brand": "Gautam Homestay",
+    "copyright": "© {{year}} Gautam Homestay. All rights reserved.",
+    "rooms": "Rooms",
+    "amenities": "Amenities",
+    "contact": "Contact"
+  },
+  "common": {
+    "retry": "Retry"
+  }
+}
