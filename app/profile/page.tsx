@@ -39,9 +39,10 @@ export default function ProfilePage() {
     setFormData((prev) => (prev ? { ...prev, [e.target.name]: val } : prev));
   };
 
-  const handleSave = () => {
-    if (formData) {
-      updateProfile(formData);
+  const handleSave = async () => {
+    if (!formData) return;
+    const result = await updateProfile(formData);
+    if (result.ok) {
       setEditing(false);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);

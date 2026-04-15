@@ -1,95 +1,112 @@
 'use client';
 /**
- * AuthContext — thin bridge layer over the Redux auth slice.
+ * AuthContext — bridges RTK Query auth API and the Redux auth slice.
  *
- * Keeps the same `useAuth()` public API so that login/register/profile pages
- * and the Navbar don't need to know about Redux internals directly.
- * All state lives in the Redux store (app/features/auth/authSlice.ts).
+ * Keeps the same public useAuth() API so login/register/profile pages
+ * and the Navbar require no changes.
  */
-import { createContext, useContext, useEffect } from 'react';
+import { createContext, type ReactNode,useContext, useEffect } from 'react';
 
 import {
-  clearAuthError,
-  hydrateAuth,
-  loginUser,
-  logoutUser,
-  registerUser,
-  updateProfile as updateProfileAction,
-} from '@/app/features/auth/authSlice';
+  useGetMeQuery,
+  useLoginMutation,
+  useLogoutMutation,
+  useRegisterMutation,
+  useUpdateProfileMutation,
+} from '@/app/features/api/authApi';
+import { clearAuthError, clearUser, setUser } from '@/app/features/auth/authSlice';
 import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
 
-import type { CustomerData, OwnerData, User, UserRole } from '@/app/features/auth/authSlice';
-import type { ReactNode } from 'react';
+import type { CustomerData, OwnerData, User, UserRole } from '@/lib/types';
 
-// Re-export types so existing pages can keep their import paths
+// Re-export so existing pages keep their import paths
 export type { CustomerData, OwnerData, User, UserRole };
 
-// ─── Context type ────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function extractMsg(e: unknown): string {
+  if (typeof e === 'object' && e !== null && 'data' in e) {
+    const d = (e as { data: unknown }).data;
+    if (typeof d === 'object' && d !== null && 'message' in d) {
+      return (d as { message: string }).message;
+    }
+  }
+  return 'Something went wrong.';
+}
+
+// ─── Context type ─────────────────────────────────────────────────────────────
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   error: string | null;
-  login: (
-    email: string,
-    password: string,
-    role: UserRole,
-  ) => Promise<{ ok: boolean; error?: string }>;
+  login: (email: string, password: string, role: UserRole) => Promise<{ ok: boolean; error?: string }>;
   register: (
     role: UserRole,
     data: CustomerData | OwnerData,
     password: string,
   ) => Promise<{ ok: boolean; error?: string }>;
-  updateProfile: (data: CustomerData | OwnerData) => void;
+  updateProfile: (data: CustomerData | OwnerData) => Promise<{ ok: boolean; error?: string }>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-// ─── Provider ────────────────────────────────────────────────────────────────
+// ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const dispatch = useAppDispatch();
   const { user, isLoading, error } = useAppSelector((state) => state.auth);
 
-  // Hydrate session from localStorage once on mount
+  // Hydrate current user by calling /api/auth/me on mount
+  const { data: me, isLoading: meLoading } = useGetMeQuery();
   useEffect(() => {
-    dispatch(hydrateAuth());
-  }, [dispatch]);
+    if (!meLoading) {
+      if (me) dispatch(setUser(me));
+      else dispatch(clearUser());
+    }
+  }, [me, meLoading, dispatch]);
+
+  const [loginMutation] = useLoginMutation();
+  const [registerMutation] = useRegisterMutation();
+  const [logoutMutation] = useLogoutMutation();
+  const [updateProfileMutation] = useUpdateProfileMutation();
 
   const login = async (email: string, password: string, role: UserRole) => {
-    const result = await dispatch(loginUser({ email, password, role }));
-    if (loginUser.rejected.match(result)) {
-      return { ok: false, error: result.payload as string };
+    try {
+      await loginMutation({ email, password, role }).unwrap();
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: extractMsg(e) };
     }
-    return { ok: true };
   };
 
   const register = async (role: UserRole, data: CustomerData | OwnerData, password: string) => {
-    const result = await dispatch(registerUser({ role, data, password }));
-    if (registerUser.rejected.match(result)) {
-      return { ok: false, error: result.payload as string };
+    try {
+      await registerMutation({ role, data, password }).unwrap();
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: extractMsg(e) };
     }
-    return { ok: true };
   };
 
-  const updateProfile = (data: CustomerData | OwnerData) => {
-    dispatch(updateProfileAction(data));
+  const updateProfile = async (data: CustomerData | OwnerData) => {
+    try {
+      await updateProfileMutation(data).unwrap();
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: extractMsg(e) };
+    }
   };
 
   const logout = () => {
-    dispatch(logoutUser());
+    logoutMutation();
   };
 
-  const clearError = () => {
-    dispatch(clearAuthError());
-  };
+  const clearError = () => dispatch(clearAuthError());
 
   return (
-    <AuthContext.Provider
-      value={{ user, isLoading, error, login, register, updateProfile, logout }}
-    >
-      {/* Auto-clear stale auth errors when the component tree re-mounts */}
+    <AuthContext.Provider value={{ user, isLoading, error, login, register, updateProfile, logout }}>
       {error && <span style={{ display: 'none' }} onClick={clearError} />}
       {children}
     </AuthContext.Provider>
