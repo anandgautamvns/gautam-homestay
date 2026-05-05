@@ -1,26 +1,12 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { withAuth } from 'next-auth/middleware';
 
-import { TOKEN_COOKIE } from '@/lib/auth';
-import { verifyToken } from '@/lib/jwt';
+// Redirects unauthenticated users to /auth/login (set in authOptions.pages.signIn)
+export default withAuth({
+  pages: {
+    signIn: '/auth/login',
+  },
+});
 
 export const config = {
   matcher: ['/profile'],
 };
-
-export async function middleware(req: NextRequest) {
-  const token = req.cookies.get(TOKEN_COOKIE)?.value;
-
-  if (!token) {
-    return NextResponse.redirect(new URL('/auth/login', req.url));
-  }
-
-  try {
-    await verifyToken(token);
-    return NextResponse.next();
-  } catch {
-    // Invalid / expired token — clear cookie and redirect to login
-    const res = NextResponse.redirect(new URL('/auth/login', req.url));
-    res.cookies.set(TOKEN_COOKIE, '', { maxAge: 0, path: '/' });
-    return res;
-  }
-}

@@ -2,9 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import bcrypt from 'bcryptjs';
 
-import { setTokenCookie, toUserDTO } from '@/lib/auth';
 import { connectDB } from '@/lib/db';
-import { signToken } from '@/lib/jwt';
 import { User } from '@/models/User';
 
 export async function POST(req: NextRequest) {
@@ -43,12 +41,17 @@ export async function POST(req: NextRequest) {
     }
 
     const hashed = await bcrypt.hash(password as string, 12);
-    const doc = await User.create({ role, name, email, phone, password: hashed, ...rest });
+    await User.create({
+      role,
+      name,
+      email: (email as string).toLowerCase().trim(),
+      phone,
+      password: hashed,
+      ...rest,
+    });
 
-    const token = await signToken({ userId: String(doc._id), role });
-    const res = NextResponse.json(toUserDTO(doc), { status: 201 });
-    setTokenCookie(res, token);
-    return res;
+    // Return 201 with no body — client calls signIn('credentials') after this
+    return new NextResponse(null, { status: 201 });
   } catch (err) {
     console.error('[POST /api/auth/register]', err);
     return NextResponse.json({ message: 'Internal server error.' }, { status: 500 });

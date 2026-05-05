@@ -1,38 +1,16 @@
 'use client';
 /**
- * AuthContext — bridges RTK Query auth API and the Redux auth slice.
- *
- * Keeps the same public useAuth() API so login/register/profile pages
- * and the Navbar require no changes.
+ * AuthContext — wraps NextAuth (session/JWT) with the same useAuth() API
+ * so login, register, and profile pages require no changes.
  */
-import { createContext, type ReactNode,useContext, useEffect } from 'react';
+import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
 
-import {
-  useGetMeQuery,
-  useLoginMutation,
-  useLogoutMutation,
-  useRegisterMutation,
-  useUpdateProfileMutation,
-} from '@/app/features/api/authApi';
-import { clearAuthError, clearUser, setUser } from '@/app/features/auth/authSlice';
-import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
+import { signIn, signOut, useSession } from 'next-auth/react';
 
 import type { CustomerData, OwnerData, User, UserRole } from '@/lib/types';
 
 // Re-export so existing pages keep their import paths
 export type { CustomerData, OwnerData, User, UserRole };
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function extractMsg(e: unknown): string {
-  if (typeof e === 'object' && e !== null && 'data' in e) {
-    const d = (e as { data: unknown }).data;
-    if (typeof d === 'object' && d !== null && 'message' in d) {
-      return (d as { message: string }).message;
-    }
-  }
-  return 'Something went wrong.';
-}
 
 // ─── Context type ─────────────────────────────────────────────────────────────
 
@@ -55,59 +33,113 @@ const AuthContext = createContext<AuthContextType | null>(null);
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const dispatch = useAppDispatch();
-  const { user, isLoading, error } = useAppSelector((state) => state.auth);
+  const { status } = useSession();
+  const [user, setUser] = useState<User | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  // Hydrate current user by calling /api/auth/me on mount
-  const { data: me, isLoading: meLoading } = useGetMeQuery();
+  const isLoading = status === 'loading' || (status === 'authenticated' && user === null);
+
   useEffect(() => {
-    if (!meLoading) {
-      if (me) dispatch(setUser(me));
-      else dispatch(clearUser());
+    // When unauthenticated: defer setState out of the effect body
+    if (status === 'unauthenticated') {
+      void Promise.resolve().then(() => setUser(null));
+      return;
     }
-  }, [me, meLoading, dispatch]);
 
-  const [loginMutation] = useLoginMutation();
-  const [registerMutation] = useRegisterMutation();
-  const [logoutMutation] = useLogoutMutation();
-  const [updateProfileMutation] = useUpdateProfileMutation();
+    if (status !== 'authenticated') return;
+
+    // Fetch the full User DTO (includes CustomerData / OwnerData)
+    let cancelled = false;
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then((r) => (r.ok ? (r.json() as Promise<User>) : null))
+      .then((data) => { if (!cancelled) setUser(data); })
+      .catch(() => { if (!cancelled) setUser(null); });
+
+    return () => { cancelled = true; };
+  }, [status]);
+
+  // ─── Auth actions ──────────────────────────────────────────────────────────
 
   const login = async (email: string, password: string, role: UserRole) => {
-    try {
-      await loginMutation({ email, password, role }).unwrap();
-      return { ok: true };
-    } catch (e) {
-      return { ok: false, error: extractMsg(e) };
+    setError(null);
+    const result = await signIn('credentials', { email, password, role, redirect: false });
+    if (result?.error) {
+      const raw = decodeURIComponent(result.error).replace(/^Error:\s*/i, '');
+      const msg = raw === 'CredentialsSignin' ? 'Invalid email or password' : raw;
+      setError(msg);
+      return { ok: false, error: msg };
     }
+    return { ok: true };
   };
 
   const register = async (role: UserRole, data: CustomerData | OwnerData, password: string) => {
+    setError(null);
     try {
-      await registerMutation({ role, data, password }).unwrap();
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role, password, ...data }),
+      });
+
+      if (!res.ok) {
+        const json = (await res.json()) as { message: string };
+        setError(json.message);
+        return { ok: false, error: json.message };
+      }
+
+      // Auto sign-in via NextAuth after successful registration
+      const signInResult = await signIn('credentials', {
+        email: data.email,
+        password,
+        role,
+        redirect: false,
+      });
+
+      if (signInResult?.error) {
+        return { ok: false, error: 'Account created — please sign in.' };
+      }
+
       return { ok: true };
-    } catch (e) {
-      return { ok: false, error: extractMsg(e) };
+    } catch {
+      const msg = 'Registration failed. Please try again.';
+      setError(msg);
+      return { ok: false, error: msg };
     }
   };
 
   const updateProfile = async (data: CustomerData | OwnerData) => {
+    setError(null);
     try {
-      await updateProfileMutation(data).unwrap();
+      const res = await fetch('/api/auth/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const json = (await res.json()) as { message: string };
+        setError(json.message);
+        return { ok: false, error: json.message };
+      }
+
+      const updated = (await res.json()) as User;
+      setUser(updated);
       return { ok: true };
-    } catch (e) {
-      return { ok: false, error: extractMsg(e) };
+    } catch {
+      const msg = 'Failed to update profile.';
+      setError(msg);
+      return { ok: false, error: msg };
     }
   };
 
   const logout = () => {
-    logoutMutation();
+    setUser(null);
+    void signOut({ callbackUrl: '/' });
   };
-
-  const clearError = () => dispatch(clearAuthError());
 
   return (
     <AuthContext.Provider value={{ user, isLoading, error, login, register, updateProfile, logout }}>
-      {error && <span style={{ display: 'none' }} onClick={clearError} />}
       {children}
     </AuthContext.Provider>
   );
