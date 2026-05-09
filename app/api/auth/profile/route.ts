@@ -1,7 +1,9 @@
 import { type NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
 
-import { requireAuth, toUserDTO } from '@/lib/auth';
+import { authOptions } from '@/lib/auth-options';
 import { connectDB } from '@/lib/db';
+import { toUserDTO } from '@/lib/auth';
 import { User } from '@/models/User';
 
 // Only these fields may be updated per role
@@ -11,14 +13,16 @@ const ALLOWED: Record<'customer' | 'owner', string[]> = {
 };
 
 export async function PATCH(req: NextRequest) {
-  const auth = await requireAuth(req);
-  if (auth.unauthorized) return auth.response;
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ message: 'Unauthorised' }, { status: 401 });
+  }
 
   try {
     await connectDB();
 
     const body = (await req.json()) as Record<string, unknown>;
-    const role = auth.payload.role as 'customer' | 'owner';
+    const role = session.user.role as 'customer' | 'owner';
     const allowedFields = ALLOWED[role] ?? [];
 
     const update: Record<string, unknown> = {};
@@ -27,7 +31,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const doc = await User.findByIdAndUpdate(
-      auth.payload.userId,
+      session.user.id,
       { $set: update },
       { new: true, runValidators: true },
     );

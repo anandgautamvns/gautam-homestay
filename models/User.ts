@@ -6,6 +6,7 @@ export interface IUser extends Document {
   email: string;
   phone: string;
   password: string; // bcrypt hash
+  googleId?: string; // Google OAuth2 provider ID
   // Customer-only (optional)
   dob?: string;
   address?: string;
@@ -31,6 +32,7 @@ const userSchema = new Schema<IUser>(
     propertyAddress: { type: String },
     rooms: { type: Number },
     gst: { type: String },
+    googleId: { type: String, sparse: true },
   },
   { timestamps: true },
 );
